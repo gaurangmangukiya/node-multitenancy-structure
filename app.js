@@ -6,13 +6,15 @@ process.on('uncaughtException', (err) => {
 
 /** load Mongoose */
 const mongooseLoader = require('./loaders/mongoose');
+const {register} = require("./controllers/user/register");
 
 /** load Environment Variables */
 require('dotenv').config();
 
 /** Connect DB and load express */
-Promise.all([mongooseLoader.connect()]).then(() => {
+Promise.all([mongooseLoader.connect()]).then(async () => {
     require('./loaders/express');
+    await register();
 }).catch((err) => {
     console.log("[ERROR] [DATABASE FAIL] => ", err);
     return process.exit(1);

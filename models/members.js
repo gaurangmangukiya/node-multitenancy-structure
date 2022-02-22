@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const constant = require('../constant');
 
-module.exports = mongoose.Schema({
+module.exports = new mongoose.Schema({
     user: {
         type: mongoose.Types.ObjectId,
         required: true,
