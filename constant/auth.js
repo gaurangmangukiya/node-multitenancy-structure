@@ -3,7 +3,8 @@ module.exports = {
         ADMIN: 1,
         USER: 2
     },
+    /** Scope for your common query. Small Pieces of Lego Game */
     SCOPE: {
-        isDeleted: false,
+        isDeleted: { isDeleted: false },
     },
 }

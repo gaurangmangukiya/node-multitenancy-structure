@@ -19,6 +19,12 @@ app.get('/test', (req, res) => {
 });
 
 
+/** Loading Routes */
+
+/** auth Route */
+app.use('/auth', require('../routes/auth'));
+
+
 /**
  * Start Express Server with Port
  */
