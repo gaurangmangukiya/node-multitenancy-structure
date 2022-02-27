@@ -1,18 +1,26 @@
-const Joi = require('joi');
+const controller = require('./controller');
+const validator = require('./validator');
 
-/**
- * @method register - Register a new user
- * @type {{handler: (function(*, *): Promise<unknown>), payload: Joi.ObjectSchema<any>}}
- * @description Always export method with payload and Handler so common apis can handle it
- */
+/** Register Controller */
 exports.register = {
-    payload: Joi.object({}).options({allowUnknown: true}),
-    handler: (req, res) =>
-        new Promise(async (resolve, reject) => {
-            try {
-                return reject({error: "Error Registration", code: 400});
-            } catch (err) {
-                return reject(err);
-            }
-        })
+    handler: controller.register,
+    payload: validator.register
 };
+
+/** Login Controller */
+exports.login = {
+    handler: controller.login,
+    payload: validator.login
+};
+
+/** Verify Controller */
+exports.verifyNow = {
+    handler: controller.sendOTP,
+    payload: validator.verifyNow
+}
+
+/** Change Password Controller */
+exports.changePassword = {
+    handler: controller.changePassword,
+    payload: validator.changePassword
+}

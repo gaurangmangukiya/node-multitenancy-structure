@@ -21,7 +21,7 @@ app.get('/test', (req, res) => {
 
 /** Loading Routes */
 
-/** auth Route */
+/** master Route */
 app.use('/auth', require('../routes/auth'));
 
 
