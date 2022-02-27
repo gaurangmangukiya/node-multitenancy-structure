@@ -30,3 +30,13 @@ exports.createCompany = {
     handler: controller.createCompany,
     payload: validator.createCompany,
 }
+
+/** WorkSpace List */
+exports.getWorkspaceList = {
+    handler: controller.getWorkspaceList,
+}
+
+/** Dashboard */
+exports.getDashboard = {
+    handler: controller.getDashboard,
+}

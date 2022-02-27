@@ -7,5 +7,6 @@ module.exports = {
         TOKEN: "token",
         COMPANY: "company",
         COMPANY_USER: "members",
+        NOTES: "notes",
     }
 }

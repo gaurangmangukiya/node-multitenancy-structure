@@ -162,6 +162,8 @@ exports.changePassword = (req) => new Promise(async (resolve, reject) => {
 });
 
 
+
+/** create Company */
 exports.createCompany = (req) =>
     new Promise(async (resolve, reject) => {
         try {
@@ -203,6 +205,42 @@ exports.createCompany = (req) =>
             ]);
             return resolve();
         } catch (err) {
+            return reject(err);
+        }
+    })
+
+
+
+/** get workspace list */
+exports.getWorkspaceList = (req) =>
+    new Promise(async (resolve, reject) => {
+        try {
+            let companies = await Mongo.distinct({ db: masterDB, collection: constant.COLLECTION.COMPANY_USER, field: "company", query: { user: req.session._id, ...constant.SCOPE.isDeleted } });
+            let workspace = await Mongo.find({ db: masterDB, collection: constant.COLLECTION.COMPANY, query: { _id: { $in: companies } }, project: "name companyId" })
+            return resolve({ list: workspace });
+        }
+        catch (err) {
+            return reject(err);
+        }
+    })
+
+
+
+exports.getDashboard = (req) =>
+    new Promise(async (resolve, reject) => {
+        try {
+            await Mongo.insertOne({
+                db: req.session.db,
+                collection: constant.COLLECTION.NOTES,
+                document: {
+                    user: req.session._id,
+                    title: "Welcome to Notes",
+                    description: "This is your first note. You can edit it later.",
+                }
+            })
+            return resolve({ data: "dashboard" });
+        }
+        catch (err) {
             return reject(err);
         }
     })

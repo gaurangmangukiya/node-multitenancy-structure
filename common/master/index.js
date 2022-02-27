@@ -152,3 +152,29 @@ exports.companyInfo = async ({companyId, _id}) => {
         return false;
     }
 }
+
+
+/**
+ * @method memberInfo - Check User is Member of Company or Not
+ * @param user - ObjectId
+ * @param company - ObjectId
+ * @returns {Promise<Object|*>}
+ */
+exports.memberInfo = async ({ user, company }) => {
+    try {
+        let memberInfo = await Mongo.findOne({
+            db: masterDB,
+            collection: constant.COLLECTION.COMPANY_USER,
+            query: {
+                user: user,
+                companyId: company,
+                isDeleted: false
+            }
+        });
+        if (memberInfo) return memberInfo;
+        return false;
+    }
+    catch (err) {
+        return false;
+    }
+}
