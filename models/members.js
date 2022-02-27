@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const constant = require('../constant');
+const constant = require('../utils/constant');
 
 module.exports = new mongoose.Schema({
     user: {

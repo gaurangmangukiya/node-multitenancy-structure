@@ -13,8 +13,7 @@ exports.find = async ({
                           hint
                       }) => {
 
-    let result = await db
-        .models[collection]
+    let result = await db.model(collection, models[collection])
         .find(query, project, options)
         .populate(populate)
         .limit(limit)
@@ -27,8 +26,7 @@ exports.find = async ({
 }
 
 exports.findOne = async ({db, collection, query, project, sort, populate, hint}) => {
-    let result = await db
-        .models[collection]
+    let result = await db.model(collection, models[collection])
         .findOne(query, project)
         .sort(sort)
         .hint(hint ? hint : {})
@@ -39,7 +37,6 @@ exports.findOne = async ({db, collection, query, project, sort, populate, hint})
 }
 
 exports.insertOne = async ({db, collection, document, options}) => {
-    console.log(document);
     let result = await db.model(collection, models[collection]).create(document, options);
     return result && result.toObject ? result.toObject() : result;
 }
@@ -59,8 +56,7 @@ exports.updateOne = async ({db, collection, query, update, options}) => {
     return result ? result : null;
 }
 
-exports.
-updateMany = async ({db, collection, query, update, options}) => {
+exports.updateMany = async ({db, collection, query, update, options}) => {
     let result = await db.model(collection, models[collection])
         .updateMany(query, update, options)
         .lean();

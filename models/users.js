@@ -6,7 +6,11 @@ module.exports = new mongoose.Schema({
     profileImage: String,
     email: String,
     password: String,
-    isVerified: Boolean,
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    lastCompany: mongoose.Types.ObjectId,
     verifiedAt: Date,
     createdAt: Date,
     updatedAt: Date,

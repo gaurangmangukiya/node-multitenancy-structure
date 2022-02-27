@@ -8,7 +8,7 @@ exports.sendResponse = ({res, statusCode, data}) => {
     res.status(statusCode).json({
         error: statusCode !== 200,
         statusCode: statusCode,
-        data: data
+        data: { ...data, sendDate: new Date() }
     });
 };
 
@@ -28,7 +28,7 @@ exports.apiHandler = ({payload, handler}) => (req, res) => {
                 let {error} = payload.validate(req.body);
 
                 if (error) {
-                    return reject(error);
+                    return reject({ error: error.details?.[0].message, code: 400 });
                 }
                 return resolve();
             } catch (err) {
@@ -40,7 +40,7 @@ exports.apiHandler = ({payload, handler}) => (req, res) => {
     const processHandler = () =>
         new Promise(async (resolve, reject) => {
             try {
-                handler()?.then(resolve)?.catch(reject);
+                handler(req, res)?.then(resolve)?.catch(reject);
             } catch (err) {
                 console.log("[ERROR] PATH => ", req.path, err, JSON.stringify(req.body));
                 return reject(err);

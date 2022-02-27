@@ -18,9 +18,6 @@ exports.connect = async () => {
                 useUnifiedTopology: true
             });
 
-            /** Store Database Connection into Global Object */
-            global.masterDB = global.dbConnection.connection.db;
-
             /** Store Database Connection into Memory */
             dbConnections[process.env.MASTER_DB_NAME] = global.dbConnection;
 

@@ -2,4 +2,8 @@
 
 module.exports = {
     ...require('./auth'),
+    COLLECTION: {
+        USERS: "users",
+        TOKEN: "token",
+    }
 }
