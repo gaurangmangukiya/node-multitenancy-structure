@@ -22,7 +22,7 @@ exports.auth = async (req, res, next) => {
 
     if (!userDetail) return payload.sendResponse({res, statusCode: 401, data: {error: 'Unauthorized'}});
 
-    req.session.user = {
+    req.session = {
         firstName: userDetail.firstName,
         lastName: userDetail.lastName,
         _id: userDetail._id,

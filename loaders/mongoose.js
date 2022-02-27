@@ -19,7 +19,6 @@ exports.connect = async () => {
             });
 
             /** Store Database Connection into Memory */
-            dbConnections[process.env.MASTER_DB_NAME] = global.dbConnection;
 
             console.log('Connected to MongoDB', new Date());
             return resolve();

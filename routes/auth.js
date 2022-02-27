@@ -15,4 +15,7 @@ router.post('/verifynow', apiHandler(AuthController.verifyNow));
 /** Change Password */
 router.put('/changepassword', auth, apiHandler(AuthController.changePassword));
 
+/** Register Company */
+router.post('/create-company', auth, apiHandler(AuthController.createCompany));
+
 module.exports = router;

@@ -1,4 +1,5 @@
 const common = require('../../common');
+const ObjectId = require('mongoose').Types.ObjectId;
 const {constant, error, bcrypt, jwt} = require('../../utils');
 /**
  * @method register - Register controller
@@ -158,4 +159,50 @@ exports.changePassword = (req) => new Promise(async (resolve, reject) => {
     })
 
     return getUserDetail().then(changePassword).then(resolve).catch(reject);
-})
+});
+
+
+exports.createCompany = (req) =>
+    new Promise(async (resolve, reject) => {
+        try {
+            let companyInfo = await common.master.companyInfo({
+                companyId: req.body.companyId,
+                db: masterDB
+            });
+
+            if (companyInfo) return reject(error.auth.companyExists);
+            let companyObjectId = ObjectId();
+
+            await Promise.all([
+                Mongo.insertOne({
+                    db: masterDB,
+                    collection: constant.COLLECTION.COMPANY,
+                    document: {
+                        _id: companyObjectId,
+                        name: req.body.name,
+                        contactInfo: req.body.companyInfo || {},
+                        addressInfo: req.body.addressInfo || {},
+                        website: req.body.website || undefined,
+                        description: req.body.description || undefined,
+                        owner: req.session._id,
+                        dbName: constant.GET_DB_STRING({name: req.body?.companyId}),
+                        companyId: req.body.companyId,
+                        createdAt: new Date()
+                    }
+                }),
+                Mongo.insertOne({
+                    db: masterDB,
+                    collection: constant.COLLECTION.COMPANY_USER,
+                    document: {
+                        company: companyObjectId,
+                        user: req.session._id,
+                        role: constant.USER_TYPE.ADMIN,
+                        addedBy: req.session._id,
+                    }
+                })
+            ]);
+            return resolve();
+        } catch (err) {
+            return reject(err);
+        }
+    })
