@@ -29,3 +29,12 @@ exports.changePassword = Joi.object({
     password: Joi.string().required(),
     newPassword: Joi.string().required(),
 }).options({stripUnknown: true});
+
+/** Company */
+exports.createCompany = Joi.object({
+    name: Joi.string().required(),
+    website: Joi.string().required(),
+    contactInfo: Joi.any(),
+    companyInfo: Joi.any(),
+    companyId: Joi.string().required().lowercase().trim(),
+}).options({ allowUnknown: true });

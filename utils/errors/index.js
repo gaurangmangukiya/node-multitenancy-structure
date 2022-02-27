@@ -38,5 +38,9 @@ module.exports = {
             type: "IS_VERIFIED",
             code: 400,
         },
+        companyExists: {
+            error: "Company Exists",
+            code: 400,
+        }
     }
 }

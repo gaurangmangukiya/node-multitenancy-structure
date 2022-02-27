@@ -3,4 +3,5 @@ module.exports = {
     company: require('./company'),
     members: require('./members'),
     token: require('./token'),
+    notes: require('./notes'),
 };

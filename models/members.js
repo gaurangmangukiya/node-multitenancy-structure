@@ -19,4 +19,13 @@ module.exports = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    deletedBy: {
+        type: mongoose.Types.ObjectId,
+    },
+    addedBy: {
+        type: mongoose.Types.ObjectId,
+    },
+    lastActiveAt: {
+        type: Date,
+    }
 });

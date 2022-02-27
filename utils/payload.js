@@ -54,7 +54,7 @@ exports.apiHandler = ({payload, handler}) => (req, res) => {
             return (this.sendResponse({res, statusCode: 200, data: data}));
         })
         .catch(err => {
-            console.log("[ERROR] PATH => ", req.path, err, JSON.stringify(req.body));
+            console.log("[ERROR] PATH => ", req.originalUrl, err, JSON.stringify(req.body));
             /** if no error and no code means something wrong in code */
             if (err?.error && err?.code) {
                 return (this.sendResponse({res, statusCode: err.code, data: {...err}}));

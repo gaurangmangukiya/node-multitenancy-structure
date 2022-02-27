@@ -127,4 +127,54 @@ exports.generateOTP = ({user, otp, resend}) => {
 
         return getOTPDetail().then(resolve).catch(reject);
     })
+};
+
+
+/**
+ * @method companyInfo - get Company Info by Id or companyId
+ * @param companyId - String
+ * @param _id - ObjectId
+ * @returns {Object}
+ */
+exports.companyInfo = async ({companyId, _id}) => {
+    try {
+        let query = {};
+        if (companyId) query.companyId = companyId;
+        if (_id) query._id = _id;
+        let companyInfo = await Mongo.findOne({
+            db: masterDB,
+            collection: constant.COLLECTION.COMPANY,
+            query: query
+        })
+        if (companyInfo) return companyInfo;
+        return null;
+    } catch (err) {
+        return false;
+    }
+}
+
+
+/**
+ * @method memberInfo - Check User is Member of Company or Not
+ * @param user - ObjectId
+ * @param company - ObjectId
+ * @returns {Promise<Object|*>}
+ */
+exports.memberInfo = async ({ user, company }) => {
+    try {
+        let memberInfo = await Mongo.findOne({
+            db: masterDB,
+            collection: constant.COLLECTION.COMPANY_USER,
+            query: {
+                user: user,
+                companyId: company,
+                isDeleted: false
+            }
+        });
+        if (memberInfo) return memberInfo;
+        return false;
+    }
+    catch (err) {
+        return false;
+    }
 }

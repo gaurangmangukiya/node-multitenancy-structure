@@ -1,4 +1,5 @@
 const common = require('../../common');
+const ObjectId = require('mongoose').Types.ObjectId;
 const {constant, error, bcrypt, jwt} = require('../../utils');
 /**
  * @method register - Register controller
@@ -158,4 +159,88 @@ exports.changePassword = (req) => new Promise(async (resolve, reject) => {
     })
 
     return getUserDetail().then(changePassword).then(resolve).catch(reject);
-})
+});
+
+
+
+/** create Company */
+exports.createCompany = (req) =>
+    new Promise(async (resolve, reject) => {
+        try {
+            let companyInfo = await common.master.companyInfo({
+                companyId: req.body.companyId,
+                db: masterDB
+            });
+
+            if (companyInfo) return reject(error.auth.companyExists);
+            let companyObjectId = ObjectId();
+
+            await Promise.all([
+                Mongo.insertOne({
+                    db: masterDB,
+                    collection: constant.COLLECTION.COMPANY,
+                    document: {
+                        _id: companyObjectId,
+                        name: req.body.name,
+                        contactInfo: req.body.companyInfo || {},
+                        addressInfo: req.body.addressInfo || {},
+                        website: req.body.website || undefined,
+                        description: req.body.description || undefined,
+                        owner: req.session._id,
+                        dbName: constant.GET_DB_STRING({name: req.body?.companyId}),
+                        companyId: req.body.companyId,
+                        createdAt: new Date()
+                    }
+                }),
+                Mongo.insertOne({
+                    db: masterDB,
+                    collection: constant.COLLECTION.COMPANY_USER,
+                    document: {
+                        company: companyObjectId,
+                        user: req.session._id,
+                        role: constant.USER_TYPE.ADMIN,
+                        addedBy: req.session._id,
+                    }
+                })
+            ]);
+            return resolve();
+        } catch (err) {
+            return reject(err);
+        }
+    })
+
+
+
+/** get workspace list */
+exports.getWorkspaceList = (req) =>
+    new Promise(async (resolve, reject) => {
+        try {
+            let companies = await Mongo.distinct({ db: masterDB, collection: constant.COLLECTION.COMPANY_USER, field: "company", query: { user: req.session._id, ...constant.SCOPE.isDeleted } });
+            let workspace = await Mongo.find({ db: masterDB, collection: constant.COLLECTION.COMPANY, query: { _id: { $in: companies } }, project: "name companyId" })
+            return resolve({ list: workspace });
+        }
+        catch (err) {
+            return reject(err);
+        }
+    })
+
+
+
+exports.getDashboard = (req) =>
+    new Promise(async (resolve, reject) => {
+        try {
+            await Mongo.insertOne({
+                db: req.session.db,
+                collection: constant.COLLECTION.NOTES,
+                document: {
+                    user: req.session._id,
+                    title: "Welcome to Notes",
+                    description: "This is your first note. You can edit it later.",
+                }
+            })
+            return resolve({ data: "dashboard" });
+        }
+        catch (err) {
+            return reject(err);
+        }
+    })

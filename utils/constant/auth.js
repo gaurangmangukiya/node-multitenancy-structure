@@ -1,3 +1,4 @@
+const slugify = require("slugify");
 module.exports = {
     USER_TYPE: {
         ADMIN: 1,
@@ -14,4 +15,5 @@ module.exports = {
         isNotVerified: { isVerified: false },
     },
     GET_OTP: () => Math.floor(100000 + Math.random() * 900000),
+    GET_DB_STRING: ({ name }) => slugify(process.env.DB_PREFIX + name.toLowerCase(), {lower: true, trim: true, remove:  RegExp(/[*+~.()'"!:@]/g)}),
 }

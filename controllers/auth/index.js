@@ -24,3 +24,19 @@ exports.changePassword = {
     handler: controller.changePassword,
     payload: validator.changePassword
 }
+
+/** Create Company */
+exports.createCompany = {
+    handler: controller.createCompany,
+    payload: validator.createCompany,
+}
+
+/** WorkSpace List */
+exports.getWorkspaceList = {
+    handler: controller.getWorkspaceList,
+}
+
+/** Dashboard */
+exports.getDashboard = {
+    handler: controller.getDashboard,
+}
