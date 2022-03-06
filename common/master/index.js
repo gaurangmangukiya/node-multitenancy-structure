@@ -178,3 +178,125 @@ exports.memberInfo = async ({ user, company }) => {
         return false;
     }
 }
+
+/**
+ * @method sendInvitation - Send Invitation Mail
+ * @param email - Email
+ * @param invitedBy - userId
+ * @param company - companyId
+ * @returns {Promise<Object>} - Return User object
+ */
+exports.sendInvitation = ({email, invitedBy, company}) => {
+    return new Promise(async (resolve, reject) => {
+
+        const createToken = () =>
+            new Promise(async (resolve, reject) => {
+                try {
+                    let userObj = await Mongo.findOne({
+                        db: masterDB,
+                        collection: constant.COLLECTION.USERS,
+                        query: {email}
+                    })
+                    if (userObj) {
+                        userObj = await Mongo.findOne({
+                            db: masterDB,
+                            collection: constant.COLLECTION.COMPANY_USER,
+                            query: {
+                                user: userObj._id,
+                                companyId: company
+                            }
+                        })
+                        if (userObj) return reject(error.auth.alreadyMember)
+                    }
+                    let token = constant.GENERATE_RANDOM_STRING();
+                    let tokenData = {
+                        $set: {
+                            email,
+                            token,
+                            company,
+                            invitedBy,
+                            type: constant.OTP_TYPE.INVITATION,
+                        }
+                    }
+
+                    /** Save OTP */
+                    await Mongo.updateOne({
+                        db: masterDB,
+                        collection: constant.COLLECTION.TOKEN,
+                        query: {email, company},
+                        update: tokenData,
+                        options: {
+                            upsert: true
+                        }
+                    })
+                    return resolve();
+                } catch (err) {
+                    return reject(err);
+                }
+            })
+
+        return createToken().then(resolve).catch(reject);
+    })
+};
+
+/**
+ * @method verifyInvitation - Verify Invitation
+ * @param email
+ * @param user
+ * @param token
+ * @returns {Promise<Object>} - Return User object
+ */
+exports.verifyInvitation = ({user, token}) => {
+    return new Promise(async (resolve, reject) => {
+
+        const verifyToken = () =>
+            new Promise(async (resolve, reject) => {
+                try {
+                    let userObj = await Mongo.findOne({
+                        db: masterDB,
+                        collection: constant.COLLECTION.USERS,
+                        query: {
+                            _id: user,
+                            ...constant.SCOPE.isVerified
+                        }
+                    });
+                    if (!userObj) return reject(error.auth.userNotFound);
+
+                    /** Verify Token */
+                    let tokenDetails = await Mongo.findOne({
+                        db: masterDB,
+                        collection: constant.COLLECTION.TOKEN,
+                        query: {
+                            email: userObj.email,
+                            token,
+                            type: constant.OTP_TYPE.INVITATION,
+                        }
+                    })
+
+                    if (!tokenDetails) return reject(error.auth.invalidToken);
+                    await Mongo.insertOne({
+                        db: masterDB,
+                        collection: constant.COLLECTION.COMPANY_USER,
+                        document: {
+                            user: userObj._id,
+                            company: tokenDetails.company,
+                            invitedBy: tokenDetails.invitedBy,
+                            isDeleted: false
+                        }
+                    })
+                    await Mongo.deleteOne({
+                        db: masterDB,
+                        collection: constant.COLLECTION.TOKEN,
+                        query: {
+                            _id: tokenDetails,
+                        }
+                    })
+                    return resolve()
+                } catch (err) {
+                    return reject(err);
+                }
+            })
+
+        return verifyToken().then(resolve).catch(reject);
+    })
+};

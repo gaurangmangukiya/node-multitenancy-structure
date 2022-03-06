@@ -23,4 +23,11 @@ router.post('/workspace-list', auth, apiHandler(AuthController.getWorkspaceList)
 
 router.post('/dashboard', auth, apiHandler(AuthController.getDashboard));
 
+/** Send Invitation */
+router.post('/send-invitation', auth, apiHandler(AuthController.sendInvitation));
+router.post('/accept-invitation', auth, apiHandler(AuthController.verifyInvitation));
+
+/** OnBoard Employee */
+router.post('/onboard-employee', auth, apiHandler(AuthController.onBoardEmployee));
+
 module.exports = router;

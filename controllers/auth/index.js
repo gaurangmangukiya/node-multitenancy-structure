@@ -40,3 +40,16 @@ exports.getWorkspaceList = {
 exports.getDashboard = {
     handler: controller.getDashboard,
 }
+
+/** Dashboard */
+exports.sendInvitation = {
+    handler: controller.sendInvitation,
+}
+
+exports.verifyInvitation = {
+    handler: controller.verifyInvitation,
+}
+
+exports.onBoardEmployee = {
+    handler: controller.onBoardEmployee,
+}

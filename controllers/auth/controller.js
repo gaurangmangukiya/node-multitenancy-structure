@@ -162,7 +162,6 @@ exports.changePassword = (req) => new Promise(async (resolve, reject) => {
 });
 
 
-
 /** create Company */
 exports.createCompany = (req) =>
     new Promise(async (resolve, reject) => {
@@ -210,37 +209,93 @@ exports.createCompany = (req) =>
     })
 
 
-
 /** get workspace list */
 exports.getWorkspaceList = (req) =>
     new Promise(async (resolve, reject) => {
         try {
-            let companies = await Mongo.distinct({ db: masterDB, collection: constant.COLLECTION.COMPANY_USER, field: "company", query: { user: req.session._id, ...constant.SCOPE.isDeleted } });
-            let workspace = await Mongo.find({ db: masterDB, collection: constant.COLLECTION.COMPANY, query: { _id: { $in: companies } }, project: "name companyId" })
-            return resolve({ list: workspace });
-        }
-        catch (err) {
+            let companies = await Mongo.distinct({
+                db: masterDB,
+                collection: constant.COLLECTION.COMPANY_USER,
+                field: "company",
+                query: {user: req.session._id, ...constant.SCOPE.isDeleted}
+            });
+            let workspace = await Mongo.find({
+                db: masterDB,
+                collection: constant.COLLECTION.COMPANY,
+                query: {_id: {$in: companies}},
+                project: "name companyId"
+            })
+            return resolve({list: workspace});
+        } catch (err) {
             return reject(err);
         }
     })
 
 
-
 exports.getDashboard = (req) =>
     new Promise(async (resolve, reject) => {
         try {
-            await Mongo.insertOne({
-                db: req.session.db,
-                collection: constant.COLLECTION.NOTES,
+            return resolve({data: req.session});
+        } catch (err) {
+            return reject(err);
+        }
+    })
+
+
+exports.sendInvitation = (req) =>
+    new Promise(async (resolve, reject) => {
+        try {
+            await common.master.sendInvitation({
+                email: req.body.email,
+                company: req.body.company,
+                invitedBy: req.session._id
+            });
+            return resolve({data: "invitation sent"});
+        } catch (err) {
+            return reject(err);
+        }
+    })
+
+
+exports.verifyInvitation = (req) =>
+    new Promise(async (resolve, reject) => {
+        try {
+            if (!req.body.token) return reject(error.auth.invalidToken);
+            await common.master.verifyInvitation({user: req.session._id, token: req.body.token});
+            return resolve({data: "invitation verified"});
+        } catch (err) {
+            return reject(err);
+        }
+    })
+
+exports.onBoardEmployee = (req) =>
+    new Promise(async (resolve, reject) => {
+        try {
+            let password = constant.GENERATE_PASSWORD();
+            let hashedPassord = await bcrypt.getHash({password});
+            let userObj = await Mongo.insertOne({
+                db: masterDB,
+                collection: constant.COLLECTION.USERS,
                 document: {
-                    user: req.session._id,
-                    title: "Welcome to Notes",
-                    description: "This is your first note. You can edit it later.",
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    email: req.body.email,
+                    password: hashedPassord,
+                    isVerified: true
                 }
             })
-            return resolve({ data: "dashboard" });
-        }
-        catch (err) {
+            await Mongo.insertOne({
+                db: masterDB,
+                collection: constant.COLLECTION.COMPANY_USER,
+                document: {
+                    user: userObj._id,
+                    company: req.body.company,
+                    role: constant.USER_TYPE.USER,
+                    addedBy: req.session._id,
+                }
+            })
+            return resolve({message: "Employee added successfully", email: userObj.email, password});
+        } catch (err) {
             return reject(err);
         }
     })

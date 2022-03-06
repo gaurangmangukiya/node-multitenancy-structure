@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
-const { constant } = require('../utils');
+const {constant} = require('../utils');
 
 module.exports = new mongoose.Schema({
     user: mongoose.Types.ObjectId,
     email: String,
     otp: String,
+    token: String,
+    company: mongoose.Types.ObjectId,
     type: {
         type: Number,
         enum: [...Object.values(constant.OTP_TYPE)],
