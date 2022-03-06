@@ -12,7 +12,7 @@ exports.userInfo = ({email, user}) => {
         try {
             let query = {};
             if (email) query.email = email;
-            if (user) query.user = user;
+            if (user) query._id = user;
             let userInfo = await Mongo.findOne({db: masterDB, collection: constant.COLLECTION.USERS, query});
             return resolve(userInfo);
         } catch (err) {

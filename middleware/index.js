@@ -35,10 +35,10 @@ exports.auth = async (req, res, next) => {
     };
 
     /** Check Company ID is there */
-    if (req.body.companyId) {
+    if (req.headers.company) {
 
         /** Company Info */
-        companyDetail = await common.master.companyInfo({company: req.body.companyId, db: masterDB});
+        companyDetail = await common.master.companyInfo({company: req.headers.company, db: masterDB});
 
         /** Is Member or not */
         memberInfo = await common.master.memberInfo({user: userDetail._id, company: companyDetail._id, db: masterDB});
